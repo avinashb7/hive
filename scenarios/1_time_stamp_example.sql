@@ -10,7 +10,7 @@ LOAD DATA LOCAL INPATH '/home/training/Desktop/time_sample.txt' INTO TABLE time_
 
 --We need to convert the time field to YYYY-MM-DD to be able to work with hive timestamp;
 
---Get next 15 days records.
+--Get next 15 days records from current date.
 SELECT * FROM time_sample WHERE DATEDIFF(current_date,doj) > -15 AND DATEDIFF(current_date,doj) < 0;
 
 SELECT * FROM time_sample WHERE doj BETWEEN '2019-02-01 00:00:00' AND '2019-03-01 00:00:00';

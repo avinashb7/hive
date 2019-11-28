@@ -1,0 +1,95 @@
+Task 5 
+
+val myLog = sc.textFile("file:///home/training/Desktop/quest-task/data/sample_spark_logs.log")
+
+1. Count the number of words in the file.
+
+val totalWords = myLog.flatMap(_.split("""\s+""")).count()
+
+2. Count the number of line in the file.
+
+val totalLines = myLog.count
+
+3. Count the number of lines having log level as “ERROR”
+
+val errorCount = myLog.filter(_.contains("ERROR")).count
+
+4. Count the number of words starting with “com.apple.”
+
+val comApp = myLog.flatMap(_.split("""\s+""")).filter(_.startsWith("com.apple")).count()
+
+5. Create different files for Warning, error and INFo logs in HDFS. 
+
+val errorLog = myLog.filter(_.contains("ERROR"))
+
+val warnLog = myLog.filter(_.contains("WARN"))
+
+val infoLog = myLog.filter(_.contains("INFO"))
+
+
+
+Task : 2
+
+1. Read customer.txt store it to RDD
+
+val custRDD = sc.textFile("file:///home/training/Desktop/quest-task/data/customer.txt")
+
+2. Convert the RDD to DataFrame
+
+
+3.Create a custom class to represent the Customer
+case class Customer(id:Int,name:String,city:String,state:String,zipcode:Int)
+
+4.Create a DataFrame of Customer objects from the RDD by mapping to case class Customer.
+
+val custDF = custRDD.map(_.split(",")).map(a => Customer(a(0).trim.toInt,a(1).trim.toString,a(2).trim.toString,a(3).trim.toString,a(4).trim.trim.toInt)).toDF()
+
+
+5.Register DataFrame as a table.
+
+custDF.createOrReplaceTempView("customer")
+
+6.Select customer name column
+spark.sql("SELECT name FROM customer").show()
+
+
+Task : 1
+
+RDD : (please code through SCALA avoid spark-sql try in spark-api)
+1.Create a RDD without reading a FILE
+
+val myList = List(1,2,3,4,5)
+val myRDD = sc.parallelize(myList)
+
+
+2. Create a RDD reading bank.csv (attached) FILE (comma separated)
+
+val bankRDD = sc.textFile("file:///home/training/Desktop/quest-task/data/bank.csv")
+
+   
+3. Split each record into tokens/fields
+
+val splitRDD = bankRDD.map(_.split(";"))
+
+   Find total number of fields in the record
+  
+4. Total number of customers who got credit and who could not get credit.
+5. Find how many people are married, employed and educated who got the loan and who could not get the loan.
+
+ Task : 6 (use us-500.csv)
+ 
+Load the attached dataset into a dataframe.
+val usDF = spark.read.format("csv").option("inferSchema","true").option("header","true").load("file:///home/training/Desktop/quest-task/data/us 500.csv")
+
+Remove the duplicate rows from the Dataset.
+val withoutDup = usDF.dropDuplicates()
+withoutDup.count
+
+Remove the rows having invalid email ids.
+
+
+Remove http:// from the web column
+
+val webDF = withoutDup.withColumn("web_mod",regexp_replace($"web","http://","")).drop($"web")
+
+Write the final result to a Hive ORC table (Table should be Partitioned based on state column)
